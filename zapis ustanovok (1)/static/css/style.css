@@ -1,0 +1,760 @@
+/* Основные цвета из сайта art-dors.ru */
+:root {
+  --primary-color: #000000; /* Черный - основной цвет текста и элементов */
+  --secondary-color: #ff0000; /* Красный - акцентный цвет */
+  --background-color: #ffffff; /* Белый - фон */
+  --light-gray: #f5f5f5; /* Светло-серый - фон блоков */
+  --border-color: #e0e0e0; /* Цвет границ */
+  --success-color: #4caf50; /* Зеленый - для успешных действий */
+  --warning-color: #ff9800; /* Оранжевый - для предупреждений */
+  --error-color: #f44336; /* Красный - для ошибок */
+  
+  /* Размеры шрифтов */
+  --font-size-small: 0.875rem;
+  --font-size-normal: 1rem;
+  --font-size-medium: 1.25rem;
+  --font-size-large: 1.5rem;
+  --font-size-xlarge: 2rem;
+  
+  /* Отступы */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Скругления */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 1rem;
+  
+  /* Тени */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Сброс стилей */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  color: var(--primary-color);
+  background-color: var(--background-color);
+  line-height: 1.6;
+}
+
+/* Контейнер */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* Шапка */
+.header {
+  background-color: var(--background-color);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md) 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  height: 50px;
+}
+
+.logo img {
+  height: 100%;
+}
+
+/* Навигация */
+.nav {
+  display: flex;
+  align-items: center;
+}
+
+.nav-item {
+  margin-left: var(--spacing-lg);
+  text-decoration: none;
+  color: var(--primary-color);
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-item:hover {
+  color: var(--secondary-color);
+}
+
+.nav-item.active {
+  color: var(--secondary-color);
+}
+
+/* Кнопки */
+.btn {
+  display: inline-block;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+  border: none;
+  font-size: var(--font-size-normal);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #333;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #cc0000;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-small);
+}
+
+/* Формы */
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+}
+
+.form-control {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-normal);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.form-hint {
+  font-size: var(--font-size-small);
+  color: #666;
+  margin-top: var(--spacing-xs);
+}
+
+/* Карточки */
+.card {
+  background-color: var(--background-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+
+.card-header {
+  padding: var(--spacing-md);
+  background-color: var(--light-gray);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.card-body {
+  padding: var(--spacing-md);
+}
+
+.card-title {
+  font-size: var(--font-size-large);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Заголовки страниц */
+.page-title {
+  font-size: var(--font-size-xlarge);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+/* Элементы управления календарем */
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Календарь */
+.calendar {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--spacing-lg);
+}
+
+.calendar th {
+  padding: var(--spacing-sm);
+  text-align: center;
+  background-color: var(--light-gray);
+  border: 1px solid var(--border-color);
+  font-weight: bold;
+}
+
+.calendar td {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  height: 120px;
+  vertical-align: top;
+  position: relative;
+}
+
+.calendar-day {
+  font-weight: bold;
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-normal);
+}
+
+.calendar-event {
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-small);
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.calendar-event:hover {
+  opacity: 0.8;
+}
+
+.calendar-event strong {
+  font-weight: bold;
+}
+
+.calendar-event.weekend {
+  background-color: var(--success-color) !important;
+  color: #000000 !important;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Кнопки бронирования в календаре */
+.book-btn {
+  width: 100%;
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-small);
+  padding: var(--spacing-xs);
+}
+
+/* Вкладки */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--spacing-lg);
+}
+
+.tab {
+  padding: var(--spacing-sm) var(--spacing-lg);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.3s;
+}
+
+.tab:hover {
+  background-color: var(--light-gray);
+}
+
+.tab.active {
+  border-bottom: 2px solid var(--secondary-color);
+  font-weight: 500;
+}
+
+/* Модальные окна */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: var(--background-color);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-lg {
+  max-width: 800px;
+}
+
+.modal-header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: var(--font-size-large);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: var(--font-size-large);
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-body {
+  padding: var(--spacing-md);
+}
+
+.modal-footer {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+}
+
+/* Таблицы */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-md);
+}
+
+.users-table th,
+.users-table td {
+  padding: var(--spacing-sm);
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.users-table th {
+  background-color: var(--light-gray);
+  font-weight: bold;
+}
+
+.color-preview {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  display: inline-block;
+  border: 1px solid var(--border-color);
+}
+
+/* Уведомления */
+.notification-badge {
+  position: relative;
+  display: inline-block;
+}
+
+.notification-badge .badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--secondary-color);
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.notification-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item.unread {
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.notification-content {
+  margin-bottom: var(--spacing-xs);
+}
+
+.notification-date {
+  font-size: var(--font-size-small);
+  color: #666;
+}
+
+/* Всплывающие уведомления */
+.notification-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: var(--success-color);
+  color: white;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+  z-index: 1100;
+  animation: slideIn 0.3s ease-out;
+}
+
+.notification-toast.fade-out {
+  animation: fadeOut 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Состояния загрузки и ошибок */
+.loading {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--error-color);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: #666;
+}
+
+.error-message {
+  color: var(--error-color);
+  font-size: var(--font-size-small);
+  margin-top: var(--spacing-xs);
+}
+
+/* Форма входа */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--spacing-md);
+}
+
+.login-container .card {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Элементы управления администратора */
+.admin-controls {
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.mb-3 {
+  margin-bottom: var(--spacing-md);
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .nav {
+    margin-top: var(--spacing-md);
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .nav-item {
+    margin-left: 0;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .page-title {
+    font-size: var(--font-size-large);
+  }
+  
+  .calendar-controls {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .calendar-controls h2 {
+    order: -1;
+  }
+  
+  .calendar td {
+    height: 80px;
+    font-size: var(--font-size-small);
+    padding: var(--spacing-xs);
+  }
+  
+  .calendar-day {
+    font-size: var(--font-size-small);
+  }
+  
+  .calendar-event {
+    font-size: 0.75rem;
+    padding: 2px;
+    margin-bottom: 2px;
+  }
+  
+  .book-btn {
+    font-size: 0.75rem;
+    padding: 2px;
+  }
+  
+  .tabs {
+    flex-wrap: wrap;
+  }
+  
+  .tab {
+    flex: 1 0 50%;
+    text-align: center;
+  }
+  
+  .modal {
+    width: 95%;
+    margin: var(--spacing-sm);
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .modal-footer .btn {
+    width: 100%;
+  }
+  
+  .users-table {
+    font-size: var(--font-size-small);
+  }
+  
+  .users-table th,
+  .users-table td {
+    padding: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .calendar th, .calendar td {
+    padding: 2px;
+    font-size: 0.75rem;
+  }
+  
+  .calendar td {
+    height: 60px;
+  }
+  
+  .tab {
+    flex: 1 0 100%;
+  }
+  
+  .notification-toast {
+    left: var(--spacing-sm);
+    right: var(--spacing-sm);
+    top: var(--spacing-sm);
+  }
+}
+
+/* Недельный вид для мобильных устройств */
+@media (max-width: 768px) {
+  .calendar-week-view {
+    display: block;
+  }
+  
+  .calendar-month-view {
+    display: none;
+  }
+  
+  .week-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .week-day {
+    border: 1px solid var(--border-color);
+    margin-bottom: var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+  }
+  
+  .week-day-header {
+    background-color: var(--light-gray);
+    padding: var(--spacing-sm);
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .week-day-content {
+    padding: var(--spacing-sm);
+    min-height: 100px;
+  }
+}
+
+@media (min-width: 769px) {
+  .calendar-week-view {
+    display: none;
+  }
+  
+  .calendar-month-view {
+    display: block;
+  }
+}
+
+
+/* Стили для выбора цвета пользователя */
+.color-picker-container {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.color-input {
+  width: 60px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+}
+
+.color-preview-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.color-preview-large {
+  width: 80px;
+  height: 40px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+}
+
+.color-text-preview {
+  width: 120px;
+  height: 30px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-small);
+  font-weight: bold;
+}
+
+@media (max-width: 480px) {
+  .color-picker-container {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .color-preview-container {
+    flex-direction: row;
+    gap: var(--spacing-sm);
+  }
+  
+  .color-preview-large {
+    width: 60px;
+    height: 30px;
+  }
+  
+  .color-text-preview {
+    width: 100px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+}
+
