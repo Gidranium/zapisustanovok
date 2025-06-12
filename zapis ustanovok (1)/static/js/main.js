@@ -4,13 +4,19 @@
 let currentUser = null;
 let calendarData = [];
 let doorType = 'entrance'; // По умолчанию показываем календарь входных дверей
-
 let calendarViewMode = 'month'; // 'month' или 'week'
-let currentWeekIndex = 0; // для недельного режима
+let currentWeekStartDate = null; // Monday date for weekly mode
 let calendarViewModeWasManuallyChanged = false;
 
 function isMobileScreen() {
     return window.innerWidth <= 768;
+}
+function getMonday(date) {
+    // Возвращает новый Date, соответствующий понедельнику недели date (или сам date, если это понедельник)
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = day === 0 ? -6 : 1 - day; // В JS 0=Sunday
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() + diff);
 }
 
 // Определяем начальный тип дверей в зависимости от роли пользователя
@@ -697,10 +703,14 @@ function loadCalendar() {
     calendarContainer.innerHTML = '<div class="loading">Загрузка календаря...</div>';
     
     // Получаем текущую дату
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-    
+let now = new Date();
+let year = now.getFullYear();
+let month = now.getMonth();
+// Для недельного режима используем currentWeekStartDate как точку отсчета
+if (calendarViewMode === 'week' && currentWeekStartDate) {
+    year = currentWeekStartDate.getFullYear();
+    month = currentWeekStartDate.getMonth();
+}
     // Формируем даты начала и конца месяца
     const startDate = new Date(year, month, 1);
     const endDate = new Date(year, month + 1, 0);
@@ -720,11 +730,17 @@ function loadCalendar() {
         })
         .then(data => {
             calendarData = data.calendar;
-            if (!calendarViewModeWasManuallyChanged) {
+    // Определяем режим по-умолчанию, если пользователь не переключал вручную
+    if (!calendarViewModeWasManuallyChanged) {
         calendarViewMode = isMobileScreen() ? 'week' : 'month';
-            }
-            renderCalendar(year, month);
-        })
+    }
+
+    // Если недельный режим и нет currentWeekStartDate, выставить на текущую неделю
+    if (calendarViewMode === 'week' && !currentWeekStartDate) {
+        currentWeekStartDate = getMonday(now);
+    }
+    renderCalendar(year, month);
+})
         .catch(error => {
             calendarContainer.innerHTML = '<div class="error">Ошибка загрузки календаря</div>';
             console.error('Calendar loading error:', error);
@@ -746,26 +762,26 @@ function renderCalendar(year, month) {
 
     // --- Добавим кнопку-переключатель вида ---
     let switchBtn = document.getElementById('switch-calendar-view');
-    if (!switchBtn) {
-        let btn = document.createElement('button');
-        btn.className = 'btn btn-outline';
-        btn.id = 'switch-calendar-view';
-        btn.style.marginLeft = "10px";
-        btn.textContent = calendarViewMode === 'month' ? 'Неделя' : 'Месяц';
-        btn.onclick = function() {
-    calendarViewModeWasManuallyChanged = true; // <--- добавить первой строкой!
-    if (calendarViewMode === 'month') {
-        calendarViewMode = 'week';
-        currentWeekIndex = 0;
-    } else {
-        calendarViewMode = 'month';
-    }
-    renderCalendar(year, month);
-};
-        calendarControls.appendChild(btn);
-    } else {
-        switchBtn.textContent = calendarViewMode === 'month' ? 'Неделя' : 'Месяц';
-    }
+if (!switchBtn) {
+    let btn = document.createElement('button');
+    btn.className = 'btn btn-outline';
+    btn.id = 'switch-calendar-view';
+    btn.style.marginLeft = "10px";
+    btn.textContent = calendarViewMode === 'month' ? 'Неделя' : 'Месяц';
+    btn.onclick = function() {
+        calendarViewModeWasManuallyChanged = true;
+        if (calendarViewMode === 'month') {
+            calendarViewMode = 'week';
+            currentWeekStartDate = getMonday(new Date(year, month, 1));
+        } else {
+            calendarViewMode = 'month';
+        }
+        loadCalendar(currentWeekStartDate || new Date(year, month, 1));
+    };
+    calendarControls.appendChild(btn);
+} else {
+    switchBtn.textContent = calendarViewMode === 'month' ? 'Неделя' : 'Месяц';
+}
 
     // --- Считаем недели месяца ---
     const firstDay = new Date(year, month, 1);
@@ -888,79 +904,85 @@ function renderCalendar(year, month) {
 
     // --- Недельный режим (одна неделя, вертикально) ---
     if (calendarViewMode === 'week') {
-        // Показываем только одну неделю
-        let week = weeks[currentWeekIndex];
+        // Текущий понедельник
+        let monday = new Date(currentWeekStartDate);
+        // Массив дней недели (Date)
+        let days = [];
+        for (let i = 0; i < 7; i++) {
+            let d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            days.push(d);
+        }
+        // Показываем месяц в заголовке по понедельнику недели (или по месяцу среды недели, как хотите)
+        const midOfWeek = new Date(monday);
+        midOfWeek.setDate(monday.getDate() + 3);
+        currentMonthElement.textContent = `${monthNames[midOfWeek.getMonth()]} ${midOfWeek.getFullYear()}`;
+
         let calendarHtml = '<div class="calendar-week-vertical">';
         for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
-            let day = week[dayIdx];
-            if (!day) continue; // <--- пропуск пустых дней!
-        calendarHtml += `<div class="calendar-day-vertical">`;
-        const dateStr = formatDate(day);
-        const dayData = calendarData.find(dayObj => dayObj.date === dateStr);
-        calendarHtml += `<div class="week-day-title">${dayNames[dayIdx]}, ${day.getDate()}.${String(day.getMonth()+1).padStart(2,'0')}</div>`;
+            let day = days[dayIdx];
+            const dateStr = formatDate(day);
+            const dayData = calendarData.find(dayObj => dayObj.date === dateStr);
             calendarHtml += `<div class="calendar-day-vertical">`;
-            if (day) {
-                const dateStr = formatDate(day);
-                const dayData = calendarData.find(dayObj => dayObj.date === dateStr);
-                calendarHtml += `<div class="week-day-title">${dayNames[dayIdx]}, ${day.getDate()}.${String(day.getMonth()+1).padStart(2,'0')}</div>`;
-                if (dayData && dayData.morning) {
-                    const userColor = dayData.morning.user.user_color || '#3498db';
-                    const textColor = getContrastColor(userColor);
-                    if (dayData.morning.is_weekend) {
-                        calendarHtml += `
-                            <div class="calendar-event morning weekend" data-appointment-id="${dayData.morning.id}" 
-                                 style="background-color: #4caf50; color: #000000;">
-                                <strong>ВЫХОДНОЙ</strong>
-                            </div>
-                        `;
-                    } else {
-                        calendarHtml += `
-                            <div class="calendar-event morning" data-appointment-id="${dayData.morning.id}" 
-                                 style="background-color: ${userColor}; color: ${textColor};">
-                                <strong>Утро: ${dayData.morning.user.username}</strong>
-                                ${dayData.morning.invoice_number ? `<br>Накладная: ${dayData.morning.invoice_number}` : ''}
-                                ${dayData.morning.address ? `<br>Адрес: ${dayData.morning.address}` : ''}
-                            </div>
-                        `;
-                    }
+            calendarHtml += `<div class="week-day-title">${dayNames[dayIdx]}, ${day.getDate()}.${String(day.getMonth()+1).padStart(2,'0')}</div>`;
+            // ... только одна дата в ячейке, не дублируем!
+            if (dayData && dayData.morning) {
+                const userColor = dayData.morning.user.user_color || '#3498db';
+                const textColor = getContrastColor(userColor);
+                if (dayData.morning.is_weekend) {
+                    calendarHtml += `
+                        <div class="calendar-event morning weekend" data-appointment-id="${dayData.morning.id}" 
+                             style="background-color: #4caf50; color: #000000;">
+                            <strong>ВЫХОДНОЙ</strong>
+                        </div>
+                    `;
                 } else {
                     calendarHtml += `
-                        <button class="btn btn-sm btn-outline book-btn" 
-                                data-date="${dateStr}" 
-                                data-time-slot="morning">
-                            Забронировать утро
-                        </button>
+                        <div class="calendar-event morning" data-appointment-id="${dayData.morning.id}" 
+                             style="background-color: ${userColor}; color: ${textColor};">
+                            <strong>Утро: ${dayData.morning.user.username}</strong>
+                            ${dayData.morning.invoice_number ? `<br>Накладная: ${dayData.morning.invoice_number}` : ''}
+                            ${dayData.morning.address ? `<br>Адрес: ${dayData.morning.address}` : ''}
+                        </div>
                     `;
                 }
-                if (dayData && dayData.afternoon) {
-                    const userColor = dayData.afternoon.user.user_color || '#3498db';
-                    const textColor = getContrastColor(userColor);
-                    if (dayData.afternoon.is_weekend) {
-                        calendarHtml += `
-                            <div class="calendar-event afternoon weekend" data-appointment-id="${dayData.afternoon.id}" 
-                                 style="background-color: #4caf50; color: #000000;">
-                                <strong>ВЫХОДНОЙ</strong>
-                            </div>
-                        `;
-                    } else {
-                        calendarHtml += `
-                            <div class="calendar-event afternoon" data-appointment-id="${dayData.afternoon.id}" 
-                                 style="background-color: ${userColor}; color: ${textColor};">
-                                <strong>Вечер: ${dayData.afternoon.user.username}</strong>
-                                ${dayData.afternoon.invoice_number ? `<br>Накладная: ${dayData.afternoon.invoice_number}` : ''}
-                                ${dayData.afternoon.address ? `<br>Адрес: ${dayData.afternoon.address}` : ''}
-                            </div>
-                        `;
-                    }
+            } else {
+                calendarHtml += `
+                    <button class="btn btn-sm btn-outline book-btn" 
+                            data-date="${dateStr}" 
+                            data-time-slot="morning">
+                        Забронировать утро
+                    </button>
+                `;
+            }
+            if (dayData && dayData.afternoon) {
+                const userColor = dayData.afternoon.user.user_color || '#3498db';
+                const textColor = getContrastColor(userColor);
+                if (dayData.afternoon.is_weekend) {
+                    calendarHtml += `
+                        <div class="calendar-event afternoon weekend" data-appointment-id="${dayData.afternoon.id}" 
+                             style="background-color: #4caf50; color: #000000;">
+                            <strong>ВЫХОДНОЙ</strong>
+                        </div>
+                    `;
                 } else {
                     calendarHtml += `
-                        <button class="btn btn-sm btn-outline book-btn" 
-                                data-date="${dateStr}" 
-                                data-time-slot="afternoon">
-                            Забронировать вечер
-                        </button>
+                        <div class="calendar-event afternoon" data-appointment-id="${dayData.afternoon.id}" 
+                             style="background-color: ${userColor}; color: ${textColor};">
+                            <strong>Вечер: ${dayData.afternoon.user.username}</strong>
+                            ${dayData.afternoon.invoice_number ? `<br>Накладная: ${dayData.afternoon.invoice_number}` : ''}
+                            ${dayData.afternoon.address ? `<br>Адрес: ${dayData.afternoon.address}` : ''}
+                        </div>
                     `;
                 }
+            } else {
+                calendarHtml += `
+                    <button class="btn btn-sm btn-outline book-btn" 
+                            data-date="${dateStr}" 
+                            data-time-slot="afternoon">
+                        Забронировать вечер
+                    </button>
+                `;
             }
             calendarHtml += `</div>`;
         }
@@ -968,10 +990,9 @@ function renderCalendar(year, month) {
 
         // Кнопки недели
         let weekBtns = '';
-    weekBtns += `<button id="prev-week" class="btn btn-outline" style="margin-right:8px;">←</button>`;
-    weekBtns += `<span style="font-weight:600;">Неделя ${currentWeekIndex+1} из ${weeks.length}</span>`;
-    weekBtns += `<button id="next-week" class="btn btn-outline" style="margin-left:8px;">→</button>`;
-    calendarContainer.innerHTML = `<div class="week-switch-row" style="display:flex;align-items:center;justify-content:center;margin-bottom:1em;">${weekBtns}</div>${calendarHtml}`;
+        weekBtns += `<button id="prev-week" class="btn btn-outline" style="margin-right:8px;">Предыдущая неделя</button>`;
+        weekBtns += `<button id="next-week" class="btn btn-outline" style="margin-left:8px;">Следующая неделя</button>`;
+        calendarContainer.innerHTML = `<div class="week-switch-row" style="display:flex;align-items:center;justify-content:center;margin-bottom:1em;">${weekBtns}</div>${calendarHtml}`;
 
         // Прячем кнопки для месяца, показываем для недели
         document.getElementById('prev-month').style.display = 'none';
@@ -979,18 +1000,20 @@ function renderCalendar(year, month) {
         document.getElementById('prev-week').style.display = '';
         document.getElementById('next-week').style.display = '';
 
-        // Навигация по неделям
+        // Навигация по неделям с переходом между месяцами
         document.getElementById('prev-week').onclick = () => {
-            if (currentWeekIndex > 0) {
-                currentWeekIndex--;
-                renderCalendar(year, month);
-            }
+            calendarViewModeWasManuallyChanged = true;
+            let prevMonday = new Date(currentWeekStartDate);
+            prevMonday.setDate(prevMonday.getDate() - 7);
+            currentWeekStartDate = getMonday(prevMonday);
+            loadCalendar(currentWeekStartDate);
         };
         document.getElementById('next-week').onclick = () => {
-            if (currentWeekIndex < weeks.length - 1) {
-                currentWeekIndex++;
-                renderCalendar(year, month);
-            }
+            calendarViewModeWasManuallyChanged = true;
+            let nextMonday = new Date(currentWeekStartDate);
+            nextMonday.setDate(nextMonday.getDate() + 7);
+            currentWeekStartDate = getMonday(nextMonday);
+            loadCalendar(currentWeekStartDate);
         };
     }
 
@@ -1018,19 +1041,12 @@ window.addEventListener('resize', () => {
     if (!calendarViewModeWasManuallyChanged) {
     calendarViewMode = isMobileScreen() ? 'week' : 'month';
 }
-    const currentMonthElement = document.getElementById('current-month');
-    if (!currentMonthElement) return;
-    const monthNames = [
-        'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
-        'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
-    ];
-    const [monthName, yearStr] = currentMonthElement.textContent.split(' ');
-    const month = monthNames.indexOf(monthName);
-    const year = parseInt(yearStr);
-    if (!isNaN(month) && !isNaN(year)) {
-        renderCalendar(year, month);
-    }
-});
+    let now = new Date();
+if (calendarViewMode === 'week' && currentWeekStartDate) {
+    loadCalendar(currentWeekStartDate);
+} else {
+    loadCalendar(now);
+}});
 // --- PATCH END ---
 // Показать модальное окно для бронирования
 function showBookingModal(date, timeSlot) {
