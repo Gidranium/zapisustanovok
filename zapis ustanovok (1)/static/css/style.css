@@ -857,6 +857,16 @@ body {
     font-size: 1em;
   }
 }
+/* Исправление: разрешаем месячный календарь на мобильных */
+  .calendar {
+    display: table !important;
+  }
+
+@media (max-width: 480px) {
+  .calendar-day-vertical {
+    padding: 0.3em 0.1em;
+  }
+}
 /* --- PATCH: вертикальный недельный вид --- */
 .calendar-week-vertical {
   display: flex;
@@ -894,5 +904,15 @@ body {
   }
   .week-day-title {
     font-size: 1em;
+  }
+}
+/* Исправление: разрешаем месячный календарь на мобильных */
+  .calendar {
+    display: table !important;
+  }
+
+@media (max-width: 480px) {
+  .calendar-day-vertical {
+    padding: 0.3em 0.1em;
   }
 }
