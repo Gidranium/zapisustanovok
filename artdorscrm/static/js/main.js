@@ -1070,13 +1070,37 @@ if (buildRouteBtn && addressInput) {
             return;
         }
         // Ссылка для Яндекс.Навигатора
-        const url = `yandexnavi://build_route_on_map?lat_to=&lon_to=&to=${encodeURIComponent(address)}`;
-        // Если не открылся навигатор, fallback на Яндекс.Карты
-        window.location.href = url;
-        setTimeout(() => {
+        // Функция для геокодирования адреса и построения маршрута
+function buildRoute(address) {
+    // Используем Яндекс Геокодер для получения координат по адресу
+    fetch(`https://geocode-maps.yandex.ru/1.x/?format=json&geocode=${encodeURIComponent(address)}&apikey=ВАШ_API_КЛЮЧ`)
+        .then(response => response.json())
+        .then(data => {
+            // Получаем координаты из ответа геокодера
+            const coords = data.response.GeoObjectCollection.featureMember[0].GeoObject.Point.pos.split(' ');
+            // Меняем местами, так как в ответе сначала идет долгота, потом широта
+            const lon = coords[0];
+            const lat = coords[1];
+            
+            // Формируем URL для Яндекс Навигатора с координатами
+            const naviUrl = `yandexnavi://build_route_on_map?lat_to=${lat}&lon_to=${lon}`;
+            
+            // Пытаемся открыть Яндекс Навигатор
+            const naviWindow = window.open(naviUrl, '_blank');
+            
+            // Fallback на Яндекс.Карты
+            setTimeout(() => {
+                if (!naviWindow || naviWindow.closed) {
+                    // Используем координаты для Яндекс.Карт
+                    window.open(`https://yandex.ru/maps/?rtext=~${lat},${lon}`, '_blank');
+                }
+            }, 500);
+        })
+        .catch(error => {
+            console.error('Ошибка геокодирования:', error);
+            // В случае ошибки геокодирования используем исходный адрес
             window.open(`https://yandex.ru/maps/?rtext=~${encodeURIComponent(address)}`, '_blank');
-        }, 500);
-    });
+        });
 }
     modalContainer.innerHTML = `
         <div class="modal-backdrop">
